@@ -1,0 +1,9 @@
+drivecontrol:
+  ros__parameters:
+    lateral: stanley
+    wheelbase: 2.7
+    steer_max: 0.52
+    steer_rate_max: 0.6
+    stanley_k: 1.5
+    pp_k_v: 0.5
+    rate_hz: 100.0
