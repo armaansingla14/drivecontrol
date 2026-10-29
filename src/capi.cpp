@@ -79,11 +79,25 @@ void dc_default_config(dc_config_t* c) {
   c->estop_brake_rate = d.limits.estop_brake_rate;
   c->max_lateral_error = d.safety.max_lateral_error;
   c->controlled_decel = d.safety.controlled_decel;
+  const NaiveController::Gains g;
+  c->naive_k_e = g.k_e;
+  c->naive_k_psi = g.k_psi;
+  c->naive_kp_v = g.kp_v;
+  c->naive_ki_v = g.ki_v;
 }
 
 void* dc_create(const dc_config_t* cfg) {
   auto* h = new Handle;
-  h->ctrl = make_controller(to_cpp(*cfg), cfg->controller == 1);
+  if (cfg->controller == 1) {
+    NaiveController::Gains g;
+    g.k_e = cfg->naive_k_e;
+    g.k_psi = cfg->naive_k_psi;
+    g.kp_v = cfg->naive_kp_v;
+    g.ki_v = cfg->naive_ki_v;
+    h->ctrl = std::make_unique<NaiveController>(to_cpp(*cfg), g);
+  } else {
+    h->ctrl = std::make_unique<DriveController>(to_cpp(*cfg));
+  }
   return h;
 }
 

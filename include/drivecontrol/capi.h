@@ -37,6 +37,7 @@ typedef struct {
   double steer_max, steer_rate_max;
   double estop_brake_rate;
   double max_lateral_error, controlled_decel;
+  double naive_k_e, naive_k_psi, naive_kp_v, naive_ki_v; /* baseline gains */
 } dc_config_t;
 
 void dc_default_config(dc_config_t* cfg);

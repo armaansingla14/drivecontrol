@@ -26,7 +26,7 @@ add_library(drivecontrol_c SHARED src/capi.cpp)
 target_link_libraries(drivecontrol_c PRIVATE drivecontrol -static-libstdc++ -static-libgcc)
 
 add_executable(dc_replay tools/dc_replay.cpp)
-target_link_libraries(dc_replay PRIVATE drivecontrol)
+target_link_libraries(dc_replay PRIVATE drivecontrol -static-libstdc++ -static-libgcc)
 
 enable_testing()
 foreach(t test_pid test_path_lateral test_longitudinal test_safety_can test_controller)

@@ -3,6 +3,7 @@
 #include <cmath>
 #include <cstdint>
 #include <limits>
+#include <vector>
 
 #include "drivecontrol/types.hpp"
 
@@ -42,22 +43,51 @@ Path::Projection Path::project(double px, double py, size_t hint, size_t window)
     lo = hint > window ? hint - window : 0;
     hi = hint + window < pts_.size() - 1 ? hint + window : pts_.size() - 1;
   }
-  double best_d2 = std::numeric_limits<double>::infinity();
-  for (size_t i = lo; i < hi; ++i) {
+  // segment distances; on a global search, near-ties (overlapping laps,
+  // crossings) resolve to the earliest segment within 0.5 m of the best
+  auto seg_dist2 = [&](size_t i, double& t_out, double& qx, double& qy) {
     const PathPoint& a = pts_[i];
     const PathPoint& b = pts_[i + 1];
     const double dx = b.x - a.x, dy = b.y - a.y;
     const double l2 = dx * dx + dy * dy;
     double t = l2 > 0 ? ((px - a.x) * dx + (py - a.y) * dy) / l2 : 0.0;
     t = clamp(t, 0.0, 1.0);
-    const double qx = a.x + t * dx, qy = a.y + t * dy;
-    const double d2 = (px - qx) * (px - qx) + (py - qy) * (py - qy);
+    qx = a.x + t * dx;
+    qy = a.y + t * dy;
+    t_out = t;
+    return (px - qx) * (px - qx) + (py - qy) * (py - qy);
+  };
+  double best_d2 = std::numeric_limits<double>::infinity();
+  for (size_t i = lo; i < hi; ++i) {
+    double t, qx, qy;
+    const double d2 = seg_dist2(i, t, qx, qy);
     if (d2 < best_d2) {
       best_d2 = d2;
       best.index = i;
       best.t = t;
       best.x = qx;
       best.y = qy;
+    }
+  }
+  if (hint == SIZE_MAX) {
+    // earliest local minimum within 0.5 m of the global best
+    std::vector<double> d(hi - lo);
+    for (size_t i = lo; i < hi; ++i) {
+      double t, qx, qy;
+      d[i - lo] = seg_dist2(i, t, qx, qy);
+    }
+    const double lim = std::sqrt(best_d2) + 0.5;
+    for (size_t k = 0; k < d.size(); ++k) {
+      const bool local_min = (k == 0 || d[k] <= d[k - 1]) && (k + 1 == d.size() || d[k] <= d[k + 1]);
+      if (local_min && d[k] <= lim * lim) {
+        double t, qx, qy;
+        best_d2 = seg_dist2(lo + k, t, qx, qy);
+        best.index = lo + k;
+        best.t = t;
+        best.x = qx;
+        best.y = qy;
+        break;
+      }
     }
   }
   const PathPoint& a = pts_[best.index];

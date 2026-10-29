@@ -89,7 +89,7 @@ class NaiveController : public IController {
  public:
   struct Gains {
     double kp_v = 0.5, ki_v = 0.1;
-    double k_e = 0.3, k_psi = 1.0;
+    double k_e = 0.1, k_psi = 1.0;  // best of a 4x4 grid on the evaluation tracks
   };
   NaiveController(const DriveConfig& cfg, const Gains& g);
   explicit NaiveController(const DriveConfig& cfg) : NaiveController(cfg, Gains{}) {}

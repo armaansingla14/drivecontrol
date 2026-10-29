@@ -103,8 +103,7 @@ int main(int argc, char** argv) {
   const VehicleParams vp;
   std::ofstream out(log_out);
   size_t next = 0;
-  double dist = 0, t_estop = -1, t_stop = -1, d_estop = 0;
-  int state_prev = -1;
+  double dist = 0, t_brake = -1, t_stop = -1, d_brake = 0, t_state = -1;
   for (double t = 0.0; t <= t_end + 1e-9; t += dt) {
     while (next < frames.size() && frames[next].t <= t + 1e-9) {
       ctrl->on_can(frames[next].f, frames[next].t);
@@ -114,15 +113,12 @@ int main(int argc, char** argv) {
     CanFrame f;
     while (ctrl->pop_tx(f)) {
       write_frame(out, t, f);
-      if (f.id == canid::kStatus) {
-        StatusMsg m;
-        if (decode(f, m) && static_cast<int>(m.state) != state_prev) {
-          state_prev = m.state;
-          if ((m.state == 2 || m.state == 3) && t_estop < 0) {
-            t_estop = t;
-            d_estop = dist;
-          }
-        }
+      StatusMsg m;
+      if (f.id == canid::kStatus && decode(f, m) && (m.state == 2 || m.state == 3) && t_state < 0) t_state = t;
+      ActuatorCommand a;
+      if (f.id == canid::kActuatorCmd && decode(f, a) && a.brake > 0.05 && t_brake < 0) {
+        t_brake = t;  // first braking request seen on the bus
+        d_brake = dist;
       }
     }
     // plant: 1 ms sub-steps
@@ -140,9 +136,9 @@ int main(int argc, char** argv) {
     }
     s.steer = steer;
     s.yaw_rate = s.v / vp.wheelbase * std::tan(steer);
-    if (t_estop >= 0 && t_stop < 0 && s.v < 0.05) t_stop = t;
+    if (t_brake >= 0 && t_stop < 0 && s.v < 0.05) t_stop = t;
   }
-  std::printf("frames_in=%zu stop_triggered_at=%.3f stopped_at=%.3f stop_distance=%.2f final_speed=%.3f\n",
-              frames.size(), t_estop, t_stop, t_estop >= 0 ? dist - d_estop : -1.0, s.v);
+  std::printf("frames_in=%zu stop_state_at=%.3f first_brake_at=%.3f stopped_at=%.3f stop_distance=%.2f final_speed=%.3f\n",
+              frames.size(), t_state, t_brake, t_stop, t_brake >= 0 && t_stop >= 0 ? dist - d_brake : -1.0, s.v);
   return 0;
 }
