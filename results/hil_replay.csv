@@ -1,0 +1,9 @@
+log,controller,deterministic,stop_state_at,first_brake_at,stopped_at,stop_distance,final_speed
+nominal,full,True,-1,-1,-1,-1,19.999
+nominal,naive,True,-1,-1,-1,-1,20.014
+estop_at_6s,full,True,6,6,8.66,29.01,0.004
+estop_at_6s,naive,True,-1,6,8.56,26.89,0.007
+heartbeat_lost_at_6s,full,True,6.1,6.09,8.75,28.99,0.007
+heartbeat_lost_at_6s,naive,True,-1,-1,-1,-1,20.014
+crc_burst_6_to_6.2s,full,True,6.1,6.09,8.75,28.99,0.007
+crc_burst_6_to_6.2s,naive,True,-1,-1,-1,-1,20.014

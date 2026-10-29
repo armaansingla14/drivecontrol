@@ -183,9 +183,13 @@ def exp_estop(out: Path, md: list[str], naive_gains) -> None:
         return "-" if (isinstance(x, float) and math.isnan(x)) else format(x, fmt)
 
     for r in rows:
+        if r["stopped"]:
+            tail = f"{r['peak_decel']:.2f} | {r['peak_jerk']:.0f} | {r['lat_dev_max_m']:.2f} |"
+        else:
+            tail = "- | - | - |"  # kept driving: stop metrics not defined
         md.append(f"| {r['road']} | {r['v0']:.0f} | {r['trigger']} | {r['controller']} | {f(r['reaction_s'], '.2f')} | "
                   f"{f(r['stop_time_s'], '.2f')} | {f(r['stop_distance_m'], '.1f')} | {r['ideal_brake_distance_m']:.1f} | "
-                  f"{r['peak_decel']:.2f} | {r['peak_jerk']:.0f} | {r['lat_dev_max_m']:.2f} |")
+                  + tail)
     md.append("")
 
 

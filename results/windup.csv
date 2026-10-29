@@ -1,0 +1,5 @@
+controller,anti_windup,overshoot_mps,time_to_29_5_s,settle_after_reach_s,iae_after_reach,max_brake_after_reach
+stanley,backcalc,0.882499,10.9,13.26,5.02236,0
+stanley,clamp,0.876294,9.91,14.12,5.96641,0
+stanley,none,18.8171,9.21,15.18,139.521,0.440487
+naive,none,14.1347,10.34,21.93,114.206,0.156364
