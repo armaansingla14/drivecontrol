@@ -20,7 +20,7 @@ def test_pid_parity(aw):
     assert max(abs(a - b) for a, b in zip(c, py)) < 1e-12
 
 
-@pytest.mark.parametrize("mode,cfg", [("pure_pursuit", [3.0, 0.5, 3.0, 25.0]), ("stanley", [1.5, 1.0, 0.05, 1.0])])
+@pytest.mark.parametrize("mode,cfg", [("pure_pursuit", [3.0, 0.5, 3.0, 25.0]), ("stanley", [1.5, 1.0, 0.05, 0.002])])
 def test_lateral_parity(mode, cfg):
     rng = random.Random(1)
     tr = tracks.hairpin()

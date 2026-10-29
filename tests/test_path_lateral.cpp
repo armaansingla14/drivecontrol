@@ -130,7 +130,7 @@ TEST(PurePursuit, LookaheadScheduledWithSpeed) {
 
 TEST(Stanley, HeadingErrorTerm) {
   StanleyConfig c;
-  c.curvature_ff = false;
+  c.k_understeer = 0.0;
   c.k_yaw_rate = 0;
   Stanley st(c, 2.7);
   VehicleState s;
@@ -143,7 +143,7 @@ TEST(Stanley, HeadingErrorTerm) {
 
 TEST(Stanley, CrossTrackTerm) {
   StanleyConfig c;
-  c.curvature_ff = false;
+  c.k_understeer = 0.0;
   c.k_yaw_rate = 0;
   Stanley st(c, 2.7);
   VehicleState s;
@@ -153,14 +153,31 @@ TEST(Stanley, CrossTrackTerm) {
   CHECK_NEAR(st.steer(straight(), s), std::atan2(-1.5 * 0.5, 1.0 + 9.0), 1e-9);
 }
 
-TEST(Stanley, CurvatureFeedforward) {
+TEST(Stanley, SteersIntoCurve) {
   StanleyConfig c;
   c.k_yaw_rate = 0;
   Stanley st(c, 2.7);
   VehicleState s;
   s.v = 10;
   const double d = st.steer(circle(40), s);
-  CHECK(d > 0.04);  // includes atan(L/R) ~ 0.067
+  // heading error to the tangent at the front-axle projection ~ atan(L/R)
+  CHECK(d > 0.06 && d < 0.12);
+}
+
+TEST(Stanley, KinematicSteadyStateOnCircle) {
+  // with the front axle on a circle and the heading tangent to the rear-axle
+  // circle, the law returns the kinematic angle and no correction
+  StanleyConfig c;
+  c.k_yaw_rate = 0;
+  c.k_understeer = 0;
+  Stanley st(c, 2.7);
+  const double R = 40.0, L = 2.7;
+  const double rr = std::sqrt(R * R - L * L);  // rear-axle radius
+  VehicleState s;
+  s.x = 0;
+  s.y = R - rr;  // rear axle on the inner circle, heading +x
+  s.v = 10;
+  CHECK_NEAR(st.steer(circle(R), s), std::atan(L / rr), 2e-3);
 }
 
 TEST_MAIN()

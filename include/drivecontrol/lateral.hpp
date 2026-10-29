@@ -35,13 +35,16 @@ class PurePursuit {
   size_t hint_ = SIZE_MAX;
 };
 
-/// Stanley (front axle): steer = psi_e + atan(k e / (k_soft + v)) plus an
-/// optional curvature feedforward atan(L kappa) and yaw-rate damping.
+/// Stanley (front axle): steer = psi_e + atan(k e / (k_soft + v)), with
+/// yaw-rate damping and an understeer feedforward k_us * v^2 * kappa.
+/// The heading error is taken against the path tangent at the front-axle
+/// projection, which already contains the kinematic steering angle for a
+/// curve; adding atan(L kappa) on top would double-count it.
 struct StanleyConfig {
   double k = 1.5;
   double k_soft = 1.0;
-  double k_yaw_rate = 0.05;  ///< damping on (yaw_rate - v*kappa)
-  bool curvature_ff = true;
+  double k_yaw_rate = 0.05;    ///< damping on (yaw_rate - v*kappa)
+  double k_understeer = 0.002;  ///< rad per m/s^2 of lateral acceleration
 };
 
 class Stanley {

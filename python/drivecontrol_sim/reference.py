@@ -128,12 +128,11 @@ def pure_pursuit(path: RefPath, state, cfg4, wheelbase=2.7):
 
 def stanley(path: RefPath, state, cfg4, wheelbase=2.7):
     x, y, yaw, v, _steer, yaw_rate = state[:6]
-    k, k_soft, k_yr, ff = cfg4
+    k, k_soft, k_yr, k_us = cfg4
     fx, fy = x + wheelbase * math.cos(yaw), y + wheelbase * math.sin(yaw)
     _s, pyaw, kappa, e = path.project(fx, fy)
     psi_e = wrap(pyaw - yaw)
     delta = psi_e + math.atan2(-k * e, k_soft + abs(v))
-    if ff > 0.5:
-        delta += math.atan(wheelbase * kappa)
+    delta += k_us * v * v * kappa
     delta -= k_yr * (yaw_rate - v * kappa)
     return delta

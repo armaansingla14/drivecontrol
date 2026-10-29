@@ -36,7 +36,7 @@ double Stanley::steer(const Path& path, const VehicleState& s, LateralDebug* dbg
   const double psi_e = wrap_angle(pr.yaw - s.yaw);
   // lateral_error > 0 means the axle is left of the path -> steer right
   double delta = psi_e + std::atan2(-cfg_.k * pr.lateral_error, cfg_.k_soft + std::fabs(s.v));
-  if (cfg_.curvature_ff) delta += std::atan(L_ * pr.kappa);
+  delta += cfg_.k_understeer * s.v * s.v * pr.kappa;
   delta -= cfg_.k_yaw_rate * (s.yaw_rate - s.v * pr.kappa);
   if (dbg) {
     dbg->lateral_error = pr.lateral_error;

@@ -213,7 +213,7 @@ def exp_parity(out: Path, md: list[str]) -> None:
                  math.atan2(tr.y[i + 1] - tr.y[i], tr.x[i + 1] - tr.x[i]) + rng.gauss(0, 0.1),
                  rng.uniform(0, 25), 0.0, rng.gauss(0, 0.1))
         rp = reference.RefPath(tr.x, tr.y, tr.v)
-        for mode, cfg in (("pure_pursuit", [3.0, 0.5, 3.0, 25.0]), ("stanley", [1.5, 1.0, 0.05, 1.0])):
+        for mode, cfg in (("pure_pursuit", [3.0, 0.5, 3.0, 25.0]), ("stanley", [1.5, 1.0, 0.05, 0.002])):
             c = bridge.lateral_once(mode, cfg, tr.x, tr.y, tr.v, state)
             p = reference.pure_pursuit(rp, state, cfg) if mode == "pure_pursuit" else reference.stanley(rp, state, cfg)
             lat_err[mode] = max(lat_err[mode], abs(c - p))

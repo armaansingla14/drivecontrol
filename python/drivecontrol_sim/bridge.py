@@ -40,7 +40,7 @@ class Config(C.Structure):
     _fields_ = [("controller", C.c_int32), ("lateral", C.c_int32), ("anti_windup", C.c_int32),
                 ("use_can", C.c_int32), ("pp_ld0", C.c_double), ("pp_kv", C.c_double),
                 ("pp_ld_min", C.c_double), ("pp_ld_max", C.c_double), ("st_k", C.c_double),
-                ("st_k_soft", C.c_double), ("st_k_yaw_rate", C.c_double), ("st_curvature_ff", C.c_int32),
+                ("st_k_soft", C.c_double), ("st_k_yaw_rate", C.c_double), ("st_k_understeer", C.c_double),
                 ("v_kp", C.c_double), ("v_ki", C.c_double), ("v_kd", C.c_double), ("steer_max", C.c_double),
                 ("steer_rate_max", C.c_double), ("estop_brake_rate", C.c_double),
                 ("max_lateral_error", C.c_double), ("controlled_decel", C.c_double),

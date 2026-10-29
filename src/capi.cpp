@@ -21,7 +21,7 @@ DriveConfig to_cpp(const dc_config_t& c) {
   d.stanley.k = c.st_k;
   d.stanley.k_soft = c.st_k_soft;
   d.stanley.k_yaw_rate = c.st_k_yaw_rate;
-  d.stanley.curvature_ff = c.st_curvature_ff != 0;
+  d.stanley.k_understeer = c.st_k_understeer;
   d.speed.pid.kp = c.v_kp;
   d.speed.pid.ki = c.v_ki;
   d.speed.pid.kd = c.v_kd;
@@ -70,7 +70,7 @@ void dc_default_config(dc_config_t* c) {
   c->st_k = d.stanley.k;
   c->st_k_soft = d.stanley.k_soft;
   c->st_k_yaw_rate = d.stanley.k_yaw_rate;
-  c->st_curvature_ff = d.stanley.curvature_ff ? 1 : 0;
+  c->st_k_understeer = d.stanley.k_understeer;
   c->v_kp = d.speed.pid.kp;
   c->v_ki = d.speed.pid.ki;
   c->v_kd = d.speed.pid.kd;
@@ -211,7 +211,7 @@ double dc_lateral_once(int mode, const double* cfg4, const double* px, const dou
     PurePursuit pp(c, wheelbase);
     return pp.steer(path, vs);
   }
-  StanleyConfig c{cfg4[0], cfg4[1], cfg4[2], cfg4[3] > 0.5};
+  StanleyConfig c{cfg4[0], cfg4[1], cfg4[2], cfg4[3]};
   Stanley st(c, wheelbase);
   return st.steer(path, vs);
 }

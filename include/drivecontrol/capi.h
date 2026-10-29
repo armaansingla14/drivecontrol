@@ -32,7 +32,7 @@ typedef struct {
   int32_t use_can;
   double pp_ld0, pp_kv, pp_ld_min, pp_ld_max;
   double st_k, st_k_soft, st_k_yaw_rate;
-  int32_t st_curvature_ff;
+  double st_k_understeer;
   double v_kp, v_ki, v_kd;
   double steer_max, steer_rate_max;
   double estop_brake_rate;
